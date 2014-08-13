@@ -1,0 +1,10 @@
+{
+  "name": "MAGITransfer",
+  "version": "0.0.0",
+  "description": "MAGITransfer",
+  "main": "server.js",
+  "author": {
+    "name": "Sam Ko",
+    "email": ""
+  }
+}

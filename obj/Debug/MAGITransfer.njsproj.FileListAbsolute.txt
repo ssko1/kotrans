@@ -1,0 +1,2 @@
+c:\users\sam ko\desktop\MAGITransfer\MAGITransfer\obj\Debug\MAGITransfer.njsprojResolveAssemblyReference.cache
+c:\users\sam ko\desktop\MAGITransfer\MAGITransfer\obj\Debug\server.js
