@@ -46,7 +46,7 @@ Send a single file to the specified directory.
 Callback function is executed after file is finished transferring
 
 ```javascript
-kotrans.client.send(files, directory, callback)
+kotrans.client.sendFileMul(files, directory, callback)
 ```
 
 Send multiple files (in an array of File Objects) to the specified directory. 
