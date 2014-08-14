@@ -14,7 +14,8 @@ $ git clone git://github.com/CinnamonBagels/kotrans.git
 Client
 
 ```html
-<script src="MAGITransfer/Client/BinaryHandler/client.connection.js"></script>
+<script src="path/to/binary.js"></script>
+<script src="kotrans/Client/BinaryHandler/client.connection.js"></script>
 ```
 How to use
 ==========
