@@ -1,10 +1,10 @@
 {
-  "name": "MAGITransfer",
-  "version": "0.0.0",
-  "description": "MAGITransfer",
-  "main": "server.js",
+  "name": "kotrans",
+  "version": "1.0.0",
+  "description": "kotrans - browser-based file transfer system",
+  "main": "",
   "author": {
     "name": "Sam Ko",
-    "email": ""
+    "email": "ssko@ucsd.edu"
   }
 }

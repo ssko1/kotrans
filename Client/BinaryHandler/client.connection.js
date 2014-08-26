@@ -20,13 +20,15 @@ kotrans.client = (function () {
 	var Client2ServerFlag = {
 		send: 'send',
 		sendMul: 'sendMul',
-		done: 'done'
+		transferComplete: 'transferComplete'
 	}
-
+	
 	//sent signifies that the file chunk was sent.
 	var Server2ClientFlag = {
 		sent: 'sent',
 		sentMul: 'sentMul',
+		updateClient: 'updateClient',
+		commandComplete: 'commandComplete',
 		error: 'error'
 	}
 
@@ -57,11 +59,11 @@ kotrans.client = (function () {
 	var chunk_size = 419430400;
     
     var fileHash;
-    //stores callback functions to a file name(s)
+    //stores callback functions to a file FileController(s)
     var cbHash = {};
 
     /**
-     * creates a client object with a specified hostname on port 9000.
+     * creates a client object with a specified hostFileController on port 9000.
      * 
      * @return Client object
      */
@@ -87,12 +89,12 @@ kotrans.client = (function () {
 		client.on('stream', function (stream, meta) {
 			if (meta.cmd === Server2ClientFlag.sent) {
 				fileCount++;
-				console.log('done sending file chunk ' + meta.name);
+				console.log('done sending file chunk ' + meta.chunkName);
 				idleStreams.push(activeStreams.shift());
 				send();
 			} else if (meta.cmd === Server2ClientFlag.sentMul) {
 				fileCount++;
-				console.log('done sending file chunk ' + meta.name);
+				console.log('done sending file chunk ' + meta.chunkName);
 				idleStreams.push(activeStreams.shift());
 				sendMul();
 			} else if (meta.cmd === Server2ClientFlag.error) {
@@ -176,8 +178,10 @@ kotrans.client = (function () {
 			var fileChunk = fileChunks.shift();
 			activeStreams.push(idleStreams.shift());
 			
-			activeStreams[0] = client.send(fileChunk, { name: file.name + '_' + fileCount,
-								 						size: fileChunk.size,
+			activeStreams[0] = client.send(fileChunk, { chunkName: file.name + '_' + fileCount,
+								 						chunkSize: fileChunk.size,
+														fileSize: file.size,
+														fileName: file.name,
 								 						directory: directory, 
 								 						cmd: Client2ServerFlag.send });
 		}
@@ -188,10 +192,10 @@ kotrans.client = (function () {
 	 * Sends a message to the server indicating that the file is done
 	 */
 	function finish() {
-		client.send({}, { name: file.name,
-						  size: file.size, 
+		client.send({}, { fileName: file.name,
+						  fileSize: file.size, 
 						  fileCount: fileCount, 
-					 	  cmd: Client2ServerFlag.done });
+					 	  cmd: Client2ServerFlag.transferComplete });
 
 		//reset file counter for next file
 		fileCount = 0;
@@ -280,10 +284,11 @@ kotrans.client = (function () {
 	function sendMul() {
 		console.log('Sending the file chunks...');
 		if(fileChunks.length === 0) {
-			client.send({}, { name: file.name,
-						      size: file.size, 
-						      fileCount: fileCount, 
-					 	      cmd: Client2ServerFlag.done });
+			client.send({}, { fileName: file.name,
+						      fileSize: file.size, 
+						      fileCount: fileCount,
+						      directory: directory, 
+					 	      cmd: Client2ServerFlag.transferComplete });
 
 			fileCount = 0;
 
@@ -294,8 +299,10 @@ kotrans.client = (function () {
 			var fileChunk = fileChunks.shift();
 			activeStreams.push(idleStreams.shift());
 			
-			activeStreams[0] = client.send(fileChunk, { name: file.name + '_' + fileCount,
-								 						size: fileChunk.size,
+			activeStreams[0] = client.send(fileChunk, { chunkName: file.name + '_' + fileCount,
+								 						chunkSize: fileChunk.size,
+								 						fileSize: file.size,
+								 						fileName: file.name,
 								 						directory: directory, 
 								 						cmd: Client2ServerFlag.sendMul });
 		}

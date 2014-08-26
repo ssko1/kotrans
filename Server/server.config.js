@@ -6,7 +6,7 @@
         HOST: "localhost",
 
         PATHS: {
-            STORAGE: "",
+            STORAGE: "/storage/flightdeck/data",
             NODE: ""
         }
     }

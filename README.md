@@ -22,9 +22,10 @@ How to use
 
 Specify the host located in these files:
 
+```console
 kotrans/Client/client.config.js
 kotrans/Server/server.config.js
-
+```
 ## Creating your server
 ```javascript
 var kotrans = require('kotrans/Server/NodeHandler/server.connection.js');
