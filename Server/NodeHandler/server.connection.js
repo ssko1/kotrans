@@ -19,7 +19,7 @@ kotrans.server = (function () {
     var exec = require('child_process').exec;
     var http = require( 'http' );
     var Config = require('../server.config');
-    var BinaryServer = require('../../node_modules/binaryjs').BinaryServer;
+    var BinaryServer = require('binaryjs').BinaryServer;
     //done signifies all files were transfered
     var Client2ServerFlag = {
         send: 'send',
@@ -40,6 +40,14 @@ kotrans.server = (function () {
 	var socketServer;
 
     var uploadedBytes;
+
+    var file;
+    var percentComplete;
+    var cmd;
+    var child;
+    var i;
+    var start;
+    var timeTook;
 
     /*Creates a node.js server that listens on the given PORT located in
     ../server.config.js*/
@@ -62,12 +70,13 @@ kotrans.server = (function () {
 		client.on('stream', function (stream, meta) {
 			if (meta.cmd === Client2ServerFlag.send || meta.cmd === Client2ServerFlag.sendMul) {
                 if(meta.directory === '') {
-                    var file = fs.createWriteStream(Config.PATHS.STORAGE + '/' + meta.chunkName);
+                    file = fs.createWriteStream(Config.PATHS.STORAGE + '/' + meta.chunkName);
                 } else {
-                    var file = fs.createWriteStream(meta.directory + '/' + meta.chunkName);
+                    file = fs.createWriteStream(meta.directory + '/' + meta.chunkName);
                 }
 
-				stream.pipe(file);    
+				stream.pipe(file); 
+                start = new Date().getTime();   
 			} else if(meta.cmd === Client2ServerFlag.transferComplete) {
                 executeCommand(concatenateFiles(meta));
                 executeCommand(removeFiles(meta));
@@ -76,13 +85,16 @@ kotrans.server = (function () {
                     fileName: meta.fileName,
                     cmd: Server2ClientFlag.commandComplete
                 });
+
+                timeTook = (new Date().getTime() - start) / 100;
+                console.log('took ' + timeTook + 's');
             }
 
             // Sends data back to the client with a percentage complete with file name
 			stream.on('data', function (data) {
                 if(meta.cmd === Client2ServerFlag.send || meta.cmd === Client2ServerFlag.sendMul) {
                     uploadedBytes += data.length;
-                    var percentComplete = (uploadedBytes / meta.fileSize) * 100;
+                    percentComplete = (uploadedBytes / meta.fileSize) * 100;
                     console.log(percentComplete);
                     client.send({}, {   percent: percentComplete,
                                         fileName: meta.fileName,
@@ -110,13 +122,14 @@ kotrans.server = (function () {
         This function changes the directory and concatenates the files
         in a single command. */
     function concatenateFiles(meta) {
+        cmd = '';
         if(meta.directory === '') {
-            var cmd = 'cd' + __dirname + ';cat';
+            cmd = 'cd' + __dirname + ';cat';
         } else {
-            var cmd = 'cd ' + meta.directory + ';cat';
+            cmd = 'cd ' + meta.directory + ';cat';
         }
 
-        for(var i = 0; i < meta.fileCount; i++) {
+        for(i = 0; i < meta.fileCount; i++) {
             cmd = cmd.concat(' "' + meta.fileName + '_' + i + '"');
         }
 
@@ -133,13 +146,14 @@ kotrans.server = (function () {
         This function changes the directory and removes the files in 
         a single command. */
     function removeFiles(meta) {
+        cmd = '';
         if(meta.directory === '') {
             var cmd = 'cd ' + __dirname + ';rm';
         } else { 
             var cmd = 'cd ' + meta.directory + ';rm';
         }
 
-        for(var i = 0; i < meta.fileCount; i++) {
+        for(i = 0; i < meta.fileCount; i++) {
             cmd = cmd.concat(' "' + meta.fileName + '_' + i + '"');
         }
 
@@ -150,7 +164,7 @@ kotrans.server = (function () {
         -- Parameters --
         cmd: the command to execute */
     function executeCommand(cmd) {
-        var child = exec(cmd, function(error, stdout, stderr) {
+        child = exec(cmd, function(error, stdout, stderr) {
             console.log(stdout);
             console.log(stderr);
             if(error !== null) {
