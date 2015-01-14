@@ -87,7 +87,7 @@ kotrans.server = (function () {
                 });
 
                 timeTook = (new Date().getTime() - start) / 100;
-                console.log('took ' + timeTook + 's');
+                console.log('file took ' + timeTook + 's');
             }
 
             // Sends data back to the client with a percentage complete with file name
