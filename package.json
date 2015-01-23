@@ -1,10 +1,27 @@
 {
   "name": "kotrans",
-  "version": "1.0.0",
-  "description": "kotrans - browser-based file transfer system",
-  "main": "",
-  "author": {
-    "name": "Sam Ko",
-    "email": "ssko@ucsd.edu"
+  "version": "0.0.0",
+  "description": "Web-based file transfer system",
+  "main": " ",
+  "dependencies": {
+    "binaryjs": "~0.2.1",
+    "jquery": "~2.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CinnamonBagels/kotrans.git"
+  },
+  "keywords": [
+    "transfer",
+    "web"
+  ],
+  "author": "ssko@ucsd.edu sam ko",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/CinnamonBagels/kotrans/issues"
   }
 }
