@@ -96,8 +96,8 @@ kotrans.server = (function () {
                     cmd: Server2ClientFlag.commandComplete
                 });
 
-                timeTook = (new Date().getTime() - start) / 1000;
-                console.log('file took ' + timeTook + 's');
+                timeTook = (new Date().getTime()) - start;
+                console.log('file took ' + timeTook + 'ms');
             }
 
             // Sends data back to the client with a percentage complete with file name
@@ -181,7 +181,9 @@ kotrans.server = (function () {
                 console.log(error);
                 client.send({}, {cmd: Server2ClientFlag.error});
             }
-            cbfun();
+            if(cbfun) {
+                cbfun();
+            }
         });
     }
 
