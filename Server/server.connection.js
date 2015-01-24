@@ -73,7 +73,9 @@ kotrans.server = (function () {
                 console.log('stuff');
                 if(meta.directory === '' || typeof meta.directory === 'undefined') {
                     console.log('no');
-                    file = fs.createWriteStream(Config.PATHS.STORAGE + '/' + meta.chunkName);
+                    file = fs.createWriteStream(Config.PATHS.STORAGE + '/' + meta.chunkName, {
+                        mode : 0777
+                    });
 
                     file.on('error', function(err) {
                         console.log(err);
