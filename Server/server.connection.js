@@ -68,11 +68,11 @@ kotrans.server = (function () {
 
         //work on the incoming stream from browsers
 		client.on('stream', function (stream, meta) {
-            console.log(meta.cmd);
+            //console.log(meta.cmd);
 			if (meta.cmd === Client2ServerFlag.send || meta.cmd === Client2ServerFlag.sendMul) {
-                console.log('stuff');
+                //console.log('stuff');
                 if(meta.directory === '' || typeof meta.directory === 'undefined') {
-                    console.log('no');
+                    //console.log('no');
                     file = fs.createWriteStream(Config.PATHS.STORAGE + '/' + meta.chunkName, {
                         mode : '0775'
                     });
@@ -95,7 +95,7 @@ kotrans.server = (function () {
                     cmd: Server2ClientFlag.commandComplete
                 });
 
-                timeTook = (new Date().getTime() - start) / 100;
+                timeTook = (new Date().getTime() - start) / 1000;
                 console.log('file took ' + timeTook + 's');
             }
 
@@ -104,7 +104,7 @@ kotrans.server = (function () {
                 if(meta.cmd === Client2ServerFlag.send || meta.cmd === Client2ServerFlag.sendMul) {
                     uploadedBytes += data.length;
                     percentComplete = (uploadedBytes / meta.fileSize) * 100;
-                    console.log(percentComplete);
+                    //console.log(percentComplete);
                     client.send({}, {   percent: percentComplete,
                                         fileName: meta.fileName,
                                         cmd: Server2ClientFlag.updateClient
