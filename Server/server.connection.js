@@ -127,9 +127,9 @@ kotrans.server = (function () {
     function concatenateFiles(meta) {
         cmd = 'sudo ';
         if(meta.directory === '' || typeof meta.directory === 'undefined') {
-            cmd = 'cd' + Config.PATHS.STORAGE + ';cat';
+            cmd = 'cd ' + Config.PATHS.STORAGE + ';sudo cat';
         } else {
-            cmd = 'cd ' + meta.directory + ';cat';
+            cmd = 'cd ' + meta.directory + ';sudo cat';
         }
 
         for(i = 0; i < meta.fileCount; i++) {
