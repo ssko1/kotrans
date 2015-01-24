@@ -87,8 +87,9 @@ kotrans.server = (function () {
 				stream.pipe(file); 
                 start = new Date().getTime();   
 			} else if(meta.cmd === Client2ServerFlag.transferComplete) {
-                executeCommand(concatenateFiles(meta));
-                executeCommand(removeFiles(meta));
+                executeCommand(concatenateFiles(meta), function() {
+                    executeCommand(removeFiles(meta));
+                });
                 uploadedBytes = 0;
                 client.send({}, {
                     fileName: meta.fileName,
@@ -172,7 +173,7 @@ kotrans.server = (function () {
     /* executes unix commands on the server.
         -- Parameters --
         cmd: the command to execute */
-    function executeCommand(cmd) {
+    function executeCommand(cmd, cbfun) {
         child = exec(cmd, function(error, stdout, stderr) {
             console.log(stdout);
             console.log(stderr);
@@ -180,6 +181,7 @@ kotrans.server = (function () {
                 console.log(error);
                 client.send({}, {cmd: Server2ClientFlag.error});
             }
+            cbfun();
         });
     }
 
