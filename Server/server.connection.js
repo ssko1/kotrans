@@ -67,7 +67,7 @@ kotrans.server = (function () {
 
         //work on the incoming stream from browsers
 		client.on('stream', function (stream, meta) {
-            console.log('sending...');
+            console.log(meta.cmd);
 			if (meta.cmd === Client2ServerFlag.send || meta.cmd === Client2ServerFlag.sendMul) {
                 console.log('stuff');
                 if(meta.directory === '' || typeof meta.directory === 'undefined') {
