@@ -151,7 +151,7 @@ kotrans.server = (function () {
     function removeFiles(meta) {
         cmd = 'sudo ';
         if(meta.directory === '' || typeof meta.directory === 'undefined') {
-            var cmd = 'cd ' + Config.PATHS.STORAGE + ';rm';
+            var cmd = 'cd ' + Config.PATHS.STORAGE + ';sudo rm';
         } else { 
             var cmd = 'cd ' + meta.directory + ';rm';
         }

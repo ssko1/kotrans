@@ -1,4 +1,4 @@
-/**
+ /**
  * client.connection.js
  * 
  * Client connection using BinaryJS
@@ -16,10 +16,10 @@ var kotrans = kotrans || {};
 kotrans.Config = (function () {
     return {
         PORT: 9000,
-        HOST: "localhost",
+        HOST: "54.77.231.146",
 
         PATHS: {
-            STORAGE: "",
+            STORAGE: "/var/www/kotransBenchmark/Config",
             BINARY: ""
         }
     }
