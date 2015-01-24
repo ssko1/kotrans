@@ -22,6 +22,7 @@ kotrans.server = (function () {
     var BinaryServer = require('binaryjs').BinaryServer;
     //done signifies all files were transfered
     var Client2ServerFlag = {
+        send : 'send',
         sendMul: 'sendMul',
         transferComplete: 'transferComplete'
     }
