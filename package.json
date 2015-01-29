@@ -1,15 +1,14 @@
 {
   "name": "kotrans",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Web-based file transfer system",
   "main": " ",
   "dependencies": {
-    "binaryjs": "~0.2.1",
-    "jquery": "~2.1.1"
+    "binaryjs": "~0.2.1"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node app.js"
   },
   "repository": {
     "type": "git",

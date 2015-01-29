@@ -25,7 +25,7 @@ kotrans.Config = (function () {
     }
 })();
 
-kotrans.client = (function () {
+kotrans.client = (function ($) {
 	
 	//done signifies all file Chunks were transfered
 	var Client2ServerFlag = {
@@ -73,6 +73,9 @@ kotrans.client = (function () {
     //stores callback functions to a file FileController(s)
     var cbHash = {};
 
+    var timeTook,
+    	start;
+
     /**
      * creates a client object with a specified hostFileController on port 9000.
      * 
@@ -111,12 +114,18 @@ kotrans.client = (function () {
 			} else if (meta.cmd === Server2ClientFlag.error) {
 				console.log(stream);
 				//notify client that there was an error.
+			} else if(meta.cmd === Client2ServerFlag.transferComplete) {
+
 			}
 		});
 		
 		client.on('close', function() {
 			console.log('Client connection was stopped abruptly');
 		});
+
+		client.on('error', function(error) {
+
+		})
 		
 		return client;
 	}
@@ -155,6 +164,7 @@ kotrans.client = (function () {
 	 * into a queue.
 	 */
 	function initFile() {
+		start = new Date().getTime();
 		console.log('Initializing file: '  + file.name);
 
 		var currentSize = chunk_size;
@@ -203,6 +213,7 @@ kotrans.client = (function () {
 	 * Sends a message to the server indicating that the file is done
 	 */
 	function finish() {
+		console.log('time took: ' + (new Date().getTime() - start));
 		client.send({}, { fileName: file.name,
 						  fileSize: file.size, 
 						  fileCount: fileCount, 
@@ -334,4 +345,4 @@ kotrans.client = (function () {
 		sendFile: sendFile,
 		sendFileMul: sendFileMul
 	}
-})();
+})(jquery);

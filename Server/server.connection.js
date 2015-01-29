@@ -73,9 +73,7 @@ kotrans.server = (function () {
                 //console.log('stuff');
                 if(meta.directory === '' || typeof meta.directory === 'undefined') {
                     //console.log('no');
-                    file = fs.createWriteStream(Config.PATHS.STORAGE + '/' + meta.chunkName, {
-                        mode : '0775'
-                    });
+                    file = fs.createWriteStream(Config.PATHS.STORAGE + '/' + meta.chunkName);
 
                     file.on('error', function(err) {
                         console.log(err);
@@ -132,11 +130,11 @@ kotrans.server = (function () {
         This function changes the directory and concatenates the files
         in a single command. */
     function concatenateFiles(meta) {
-        cmd = 'sudo ';
+        cmd = '';
         if(meta.directory === '' || typeof meta.directory === 'undefined') {
-            cmd = 'cd ' + Config.PATHS.STORAGE + ';sudo cat';
+            cmd = 'cd ' + Config.PATHS.STORAGE + ';cat';
         } else {
-            cmd = 'cd ' + meta.directory + ';sudo cat';
+            cmd = 'cd ' + meta.directory + '; cat';
         }
 
         for(i = 0; i < meta.fileCount; i++) {
@@ -156,9 +154,9 @@ kotrans.server = (function () {
         This function changes the directory and removes the files in 
         a single command. */
     function removeFiles(meta) {
-        cmd = 'sudo ';
+        cmd = ' ';
         if(meta.directory === '' || typeof meta.directory === 'undefined') {
-            var cmd = 'cd ' + Config.PATHS.STORAGE + ';sudo rm';
+            var cmd = 'cd ' + Config.PATHS.STORAGE + ';rm';
         } else { 
             var cmd = 'cd ' + meta.directory + ';rm';
         }

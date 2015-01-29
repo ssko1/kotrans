@@ -7,9 +7,15 @@ Browser-based file transfer system using binary.js as the client and node.js as 
 
 Server
 
-```console
+via git
+```console 
 $ git clone git://github.com/CinnamonBagels/kotrans.git
 ```
+OR
+
+npm 
+```console
+$ npm install kotrans
 
 Client
 
@@ -28,7 +34,7 @@ kotrans/Server/server.config.js
 ```
 ## Creating your server
 ```javascript
-var kotrans = require('kotrans/Server/NodeHandler/server.connection.js');
+var kotrans = require('kotrans');
 var server = kotrans.createServer();
 ```
 Thats it! Your server should be listening on your hostname on port 9000.
@@ -47,7 +53,9 @@ Send a single file to the specified directory.
 Callback function is executed after file is finished transferring
 
 ```javascript
-kotrans.client.sendFileMul(files, directory, callback)
+kotrans.client.sendFileMul(files[], directory, callback)
+//if the directory is not specified (i.e. '') the directory will default
+//to __dirname at kotrans/Server/
 ```
 
 Send multiple files (in an array of File Objects) to the specified directory. 
