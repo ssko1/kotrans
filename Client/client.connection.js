@@ -13,18 +13,6 @@
 
 var kotrans = kotrans || {};
 
-kotrans.Config = (function () {
-    return {
-        PORT: 9000,
-        HOST: "54.77.231.146",
-
-        PATHS: {
-            STORAGE: "/var/www/kotransBenchmark/Config",
-            BINARY: ""
-        }
-    }
-})();
-
 kotrans.client = (function ($) {
 	
 	//done signifies all file Chunks were transfered
@@ -124,8 +112,8 @@ kotrans.client = (function ($) {
 		});
 
 		client.on('error', function(error) {
-
-		})
+			console.log(error);
+		});
 		
 		return client;
 	}
@@ -213,7 +201,7 @@ kotrans.client = (function ($) {
 	 * Sends a message to the server indicating that the file is done
 	 */
 	function finish() {
-		console.log('time took: ' + (new Date().getTime() - start));
+		console.log('time took: ' + (new Date().getTime() - start) + ms);
 		client.send({}, { fileName: file.name,
 						  fileSize: file.size, 
 						  fileCount: fileCount, 

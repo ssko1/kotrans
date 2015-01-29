@@ -16,6 +16,7 @@ OR
 npm 
 ```console
 $ npm install kotrans
+```
 
 Client
 
@@ -26,11 +27,11 @@ Client
 How to use
 ==========
 
-Specify the host located in these files:
+Specify the host and port located in these files (THEY ARE DEFAULTED TO localhost:9000/:
 
 ```console
-kotrans/Client/client.config.js
-kotrans/Server/server.config.js
+kotrans/Config/client.config.js
+kotrans/Config/server.config.js
 ```
 ## Creating your server
 ```javascript
@@ -47,6 +48,8 @@ var client = kotrans.client.createClient();
 
 ```javascript
 kotrans.client.sendFile(file, directory, callback)
+//if the directory is not specified (i.e. '') the directory will default
+//to __dirname at kotrans/Server/
 ```
 
 Send a single file to the specified directory. 

@@ -46,8 +46,6 @@ kotrans.server = (function () {
     var cmd;
     var child;
     var i;
-    var start;
-    var timeTook;
 
     /*Creates a node.js server that listens on the given PORT located in
     ../server.config.js*/
@@ -68,11 +66,8 @@ kotrans.server = (function () {
 
         //work on the incoming stream from browsers
 		client.on('stream', function (stream, meta) {
-            //console.log(meta.cmd);
 			if (meta.cmd === Client2ServerFlag.send || meta.cmd === Client2ServerFlag.sendMul) {
-                //console.log('stuff');
                 if(meta.directory === '' || typeof meta.directory === 'undefined') {
-                    //console.log('no');
                     file = fs.createWriteStream(Config.PATHS.STORAGE + '/' + meta.chunkName);
 
                     file.on('error', function(err) {
@@ -82,8 +77,7 @@ kotrans.server = (function () {
                     file = fs.createWriteStream(meta.directory + '/' + meta.chunkName);
                 }
 
-				stream.pipe(file); 
-                start = new Date().getTime();   
+				stream.pipe(file);    
 			} else if(meta.cmd === Client2ServerFlag.transferComplete) {
                 executeCommand(concatenateFiles(meta), function() {
                     executeCommand(removeFiles(meta));
@@ -93,9 +87,6 @@ kotrans.server = (function () {
                     fileName: meta.fileName,
                     cmd: Server2ClientFlag.commandComplete
                 });
-
-                timeTook = (new Date().getTime()) - start;
-                console.log('file took ' + timeTook + 'ms');
             }
 
             // Sends data back to the client with a percentage complete with file name

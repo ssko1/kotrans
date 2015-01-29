@@ -6,7 +6,7 @@
         HOST: "localhost",
 
         PATHS: {
-            STORAGE: '/var/www/kotransBenchmark/config',
+            STORAGE: '',
             NODE: ""
         }
     }
