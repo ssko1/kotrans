@@ -22,12 +22,13 @@ Client
 
 ```html
 <script src="path/to/binary.js"></script>
-<script src="kotrans/Client/BinaryHandler/client.connection.js"></script>
+<script src="path/to/client.config.js"></script>
+<script src="path/to/client.connection.js"></script>
 ```
 How to use
 ==========
 
-Specify the host and port located in these files (THEY ARE DEFAULTED TO localhost:9000/:
+Specify the host and port located in these files (THEY ARE DEFAULTED TO localhost:9000/):
 
 ```console
 kotrans/Config/client.config.js

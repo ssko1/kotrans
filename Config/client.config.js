@@ -9,6 +9,8 @@ kotrans.Config = (function () {
 
         PATHS: {
             STORAGE: ""
-        }
+        },
+        CHUNK_SIZE : 67108864,
+        
     }
 })();
