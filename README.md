@@ -37,9 +37,11 @@ If no port is specified, the server will default to a port of 1337.
 
 ## Creating your client
 ```javascript
-var client = kotrans.client.createClient(publicIP, port);
+var client = kotrans.client.createClient([options]);
 ```
-These arguments are default to localhost:9000 (If no arguments are passed).
+
+```options```
+
 NOTE: Your Binary Server must listen on a different port than your Web Server!
 
 ## Sending files from client to server
