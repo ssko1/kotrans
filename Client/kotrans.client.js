@@ -71,22 +71,14 @@ kotrans.client = (function ($) {
      * @return Client object
      */
 	function createClient(options) {
-		if(options.port == false) {
-			return;
-		} 
-
-		if(options.host == false) {
-			return;
-		}
-
-		clientPort = port || 9000;
-		clientHost = host || 'localhost';
-		client = new BinaryClient('ws://' + options.host + ':' + options.port + '/');
+		clientHost = options.host || 'localhost';
+		clientPort = options.port || 9000;
+		client = new BinaryClient('ws://' + clientHost + ':' + clientPort + '/');
 
 		if(client == false) {
 			return;
 		}
-		
+
 		//wait for client open
 		client.on('open', function() {
 	 		idleStreams = [];

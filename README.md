@@ -40,7 +40,9 @@ If no port is specified, the server will default to a port of 1337.
 var client = kotrans.client.createClient([options]);
 ```
 
-```options```
+* `options`
+*  `port` number. Default: `9000`
+*  `host` String. Default: `localhost`
 
 NOTE: Your Binary Server must listen on a different port than your Web Server!
 
