@@ -41,8 +41,8 @@ var client = kotrans.client.createClient([options]);
 ```
 
 * `options`
-*  `port` number. Default: `9000`
-*  `host` String. Default: `localhost`
+  * `port` number. Default: `9000`
+  * `host` String. Default: `localhost`
 
 NOTE: Your Binary Server must listen on a different port than your Web Server!
 
