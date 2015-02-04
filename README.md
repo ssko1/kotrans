@@ -22,29 +22,26 @@ Client
 
 ```html
 <script src="path/to/binary.js"></script>
-<script src="path/to/client.config.js"></script>
-<script src="path/to/client.connection.js"></script>
+<script src="path/to/kotrans.client.js"></script>
 ```
 How to use
 ==========
 
-Specify the host and port located in these files (THEY ARE DEFAULTED TO localhost:9000/):
-
-```console
-kotrans/Config/client.config.js
-kotrans/Config/server.config.js
-```
 ## Creating your server
 ```javascript
 var kotrans = require('kotrans');
-var server = kotrans.createServer();
+var server = kotrans.createServer(port, callback);
 ```
-Thats it! Your server should be listening on your hostname on port 9000.
+Thats it! Your server should be listening on the specified port.
+If no port is specified, the server will default to a port of 1337.
 
 ## Creating your client
 ```javascript
-var client = kotrans.client.createClient();
+var client = kotrans.client.createClient(publicIP, port);
 ```
+These arguments are default to localhost:9000 (If no arguments are passed).
+NOTE: Your Binary Server must listen on a different port than your Web Server!
+
 ## Sending files from client to server
 
 ```javascript
@@ -55,13 +52,3 @@ kotrans.client.sendFile(file, directory, callback)
 
 Send a single file to the specified directory. 
 Callback function is executed after file is finished transferring
-
-```javascript
-kotrans.client.sendFileMul(files[], directory, callback)
-//if the directory is not specified (i.e. '') the directory will default
-//to __dirname at kotrans/Server/
-```
-
-Send multiple files (in an array of File Objects) to the specified directory. 
-Callback function is executed after files are finished transferring
-
