@@ -179,8 +179,8 @@ kotrans.server = (function () {
     }
 
     module.exports = {
-        createServer: function() {
-            createServer();
+        createServer: function(port, callback) {
+            createServer(port, callback);
         }
     }
 })();
