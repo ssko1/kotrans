@@ -55,7 +55,7 @@ kotrans.client = (function ($) {
 
 	var MAX_STREAMS = 1;
 	
-	//400MB Chunk size for files that are large
+	//64MB Chunk size for files that are large
 	var chunk_size = 67108864;
     
     var fileHash;
@@ -70,11 +70,23 @@ kotrans.client = (function ($) {
      * 
      * @return Client object
      */
-	function createClient(host, port) {
+	function createClient(options) {
+		if(options.port == false) {
+			return;
+		} 
+
+		if(options.host == false) {
+			return;
+		}
+
 		clientPort = port || 9000;
 		clientHost = host || 'localhost';
-		client = new BinaryClient('ws://' + clientHost + ':' + port + '/');
+		client = new BinaryClient('ws://' + options.host + ':' + options.port + '/');
 
+		if(client == false) {
+			return;
+		}
+		
 		//wait for client open
 		client.on('open', function() {
 	 		idleStreams = [];
