@@ -1,1 +1,1 @@
-module.exports = require('./Server/server.connection');
+module.exports = require('./Server/kotrans.server');
