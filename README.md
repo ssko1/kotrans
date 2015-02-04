@@ -30,8 +30,14 @@ How to use
 ## Creating your server
 ```javascript
 var kotrans = require('kotrans');
-var server = kotrans.createServer(port, callback);
+var server = kotrans.createServer([options], callback);
 ```
+
+* `options`
+  * `port` number. Default: `1337`
+  * `server` Object.
+    * If left undefined, kotrans will automatically create a server listener.
+    * If a web application framework is used e.g. Express.js, pass in their server object (In the case for express, the object would be `app`)
 Thats it! Your server should be listening on the specified port.
 If no port is specified, the server will default to a port of 1337.
 

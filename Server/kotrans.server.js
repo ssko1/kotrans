@@ -47,11 +47,17 @@ kotrans.server = (function () {
     var child;
     var i;
 
-    function createServer(port, callback) {
+    function createServer(options, callback) {
+        serverPort = options.port || 1337;
 
-        serverPort = port || 1337;
-        server = http.createServer();
+        if(options.server) {
+            server = options.server;
+        } else {
+            server = http.createServer();
+        }
+
         server.listen(serverPort);
+        
         socketServer = new BinaryServer({ server: server });
         socketServer.on('connection', onSocketConnection);
         console.log("connection established on port " + serverPort);
