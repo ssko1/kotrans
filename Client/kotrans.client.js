@@ -13,7 +13,7 @@
 
 var kotrans = kotrans || {};
 
-kotrans.client = (function ($) {
+kotrans.client = (function () {
 	
 	//done signifies all file Chunks were transfered
 	var Client2ServerFlag = {
@@ -340,4 +340,4 @@ kotrans.client = (function ($) {
 		sendFile: sendFile,
 		sendFileMul: sendFileMul
 	}
-})(jquery);
+})();
