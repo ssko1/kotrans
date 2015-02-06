@@ -25,7 +25,7 @@ Client
 ```
 
 * kotrans.client.js is located in `node_modules/kotrans/Client/`
-* binary.js is located in `node_modules/kotrans/_node_modules/Binaryjs/dist/`
+* binary.js is located in `node_modules/kotrans/node_modules/Binaryjs/dist/`
 
 How to use
 ==========
@@ -37,10 +37,12 @@ var server = kotrans.createServer([options], callback);
 ```
 
 * `options`
-  * `port` number. Default: `1337`
-  * `server` Object.
-    * If left undefined, kotrans will automatically create a server listener.
-    * You may use an existing http.Server
+  ** `port` number. Default: `1337`
+  ** `server` Object.
+    *** If left undefined, kotrans will automatically create a server listener.
+    *** You may use an existing http.Server
+  ** `directory` String
+    *** Files will only be transferred to this 'allowed directory'
 
 Thats it! Your server should be listening on the specified port.
 If no port is specified, the server will default to a port of 1337.
@@ -60,10 +62,10 @@ NOTE: Your Binary Server must listen on a different port than your Web Server!
 ## Sending files from client to server
 
 ```javascript
-kotrans.client.sendFile(file, directory, callback)
-//if the directory is not specified (i.e. '') the directory will default
-//to __dirname at kotrans/Server/
+kotrans.client.sendFile(file, callback);
 ```
 
-Send a single file to the specified directory. 
+Send a single `File` object to the specified directory. 
+*  `File` is a jQuery event object given by `event.originalEvent.dataTransfer.files`
+
 Callback function is executed after file is finished transferring

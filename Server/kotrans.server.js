@@ -18,6 +18,7 @@ kotrans.server = (function () {
     var util = require('util');
     var exec = require('child_process').exec;
     var http = require( 'http' );
+    var path = require('path');
     var BinaryServer = require('binaryjs').BinaryServer;
     //done signifies all files were transfered
     var Client2ServerFlag = {
@@ -47,7 +48,10 @@ kotrans.server = (function () {
     var child;
     var i;
 
+    var allowedDirectory;
+
     function createServer(options, callback) {
+        allowedDirectory = options.directory || __dirname;
         serverPort = options.port || 1337;
 
         if(options.server) {
@@ -75,16 +79,11 @@ kotrans.server = (function () {
         //work on the incoming stream from browsers
 		client.on('stream', function (stream, meta) {
 			if (meta.cmd === Client2ServerFlag.send || meta.cmd === Client2ServerFlag.sendMul) {
-                if(meta.directory === '' || typeof meta.directory === 'undefined') {
-                    file = fs.createWriteStream(__dirname + '/' + meta.chunkName);
+                    file = fs.createWriteStream(path.join(allowedDirectory, meta.chunkName);
 
                     file.on('error', function(err) {
                         console.log(err);
                     });
-                } else {
-                    file = fs.createWriteStream(meta.directory + '/' + meta.chunkName);
-                }
-
 				stream.pipe(file);    
 			} else if(meta.cmd === Client2ServerFlag.transferComplete) {
                 executeCommand(concatenateFiles(meta), function() {
@@ -129,12 +128,7 @@ kotrans.server = (function () {
         This function changes the directory and concatenates the files
         in a single command. */
     function concatenateFiles(meta) {
-        cmd = '';
-        if(meta.directory === '' || typeof meta.directory === 'undefined') {
-            cmd = 'cd ' + __dirname + ';cat';
-        } else {
-            cmd = 'cd ' + meta.directory + '; cat';
-        }
+        cmd = 'cd ' + allowedDirectory + '; cat';
 
         for(i = 0; i < meta.fileCount; i++) {
             cmd = cmd.concat(' "' + meta.fileName + '_' + i + '"');
@@ -153,12 +147,7 @@ kotrans.server = (function () {
         This function changes the directory and removes the files in 
         a single command. */
     function removeFiles(meta) {
-        cmd = ' ';
-        if(meta.directory === '' || typeof meta.directory === 'undefined') {
-            var cmd = 'cd ' + __dirname + ';rm';
-        } else { 
-            var cmd = 'cd ' + meta.directory + ';rm';
-        }
+        cmd = 'cd ' + allowedDirectory + ';rm';
 
         for(i = 0; i < meta.fileCount; i++) {
             cmd = cmd.concat(' "' + meta.fileName + '_' + i + '"');
@@ -185,8 +174,8 @@ kotrans.server = (function () {
     }
 
     module.exports = {
-        createServer: function(port, callback) {
-            createServer(port, callback);
+        createServer: function(options, callback) {
+            createServer(options, callback);
         }
     }
 })();
