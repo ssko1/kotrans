@@ -37,12 +37,12 @@ var server = kotrans.createServer([options], callback);
 ```
 
 * `options`
-  ** `port` number. Default: `1337`
-  ** `server` Object.
-    *** If left undefined, kotrans will automatically create a server listener.
-    *** You may use an existing http.Server
-  ** `directory` String
-    *** Files will only be transferred to this 'allowed directory'
+  * `port` number. Default: `1337`
+  * `server` Object.
+    * If left undefined, kotrans will automatically create a server listener.
+    * You may use an existing http.Server
+  * `directory` String
+    * Files will only be transferred to this 'allowed directory'
 
 Thats it! Your server should be listening on the specified port.
 If no port is specified, the server will default to a port of 1337.
