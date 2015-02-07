@@ -1,6 +1,6 @@
 {
   "name": "kotrans",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Web-based file transfer system",
   "main": " ",
   "dependencies": {
@@ -16,7 +16,10 @@
   },
   "keywords": [
     "transfer",
-    "web"
+    "web",
+    "binaryjs",
+    "files",
+    "browser-only"
   ],
   "author": "ssko@ucsd.edu sam ko",
   "license": "BSD-2-Clause",

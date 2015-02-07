@@ -79,7 +79,7 @@ kotrans.server = (function () {
         //work on the incoming stream from browsers
 		client.on('stream', function (stream, meta) {
 			if (meta.cmd === Client2ServerFlag.send || meta.cmd === Client2ServerFlag.sendMul) {
-                    file = fs.createWriteStream(path.join(allowedDirectory, meta.chunkName);
+                    file = fs.createWriteStream(path.join(allowedDirectory, meta.chunkName));
 
                     file.on('error', function(err) {
                         console.log(err);
