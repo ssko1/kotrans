@@ -86,9 +86,6 @@ kotrans.server = (function () {
                     });
 				stream.pipe(file);    
 			} else if(meta.cmd === Client2ServerFlag.transferComplete) {
-                executeCommand(concatenateFiles(meta), function() {
-                    executeCommand(removeFiles(meta));
-                });
                 uploadedBytes = 0;
                 client.send({}, {
                     fileName: meta.fileName,
@@ -102,6 +99,9 @@ kotrans.server = (function () {
                     uploadedBytes += data.length;
                     percentComplete = ((uploadedBytes / meta.fileSize) * 100).toPrecision(4);
                     //console.log(percentComplete);
+                    executeCommand(concatenateFiles(meta), function() {
+                        executeCommand(removeFiles(meta));
+                    });
                     client.send({}, {   percent: percentComplete,
                                         fileName: meta.fileName,
                                         cmd: Server2ClientFlag.updateClient
@@ -130,11 +130,9 @@ kotrans.server = (function () {
     function concatenateFiles(meta) {
         cmd = 'cd ' + allowedDirectory + '; cat';
 
-        for(i = 0; i < meta.fileCount; i++) {
-            cmd = cmd.concat(' "' + meta.fileName + '_' + i + '"');
-        }
+        cmd = cmd.concat(' "' + meta.fileName + '"');
 
-        cmd = cmd.concat(' > "' + meta.fileName + '"');
+        cmd = cmd.concat(' > "' + meta.fileName.split('_')[0] + '"');
 
         return cmd;
     }
@@ -149,9 +147,7 @@ kotrans.server = (function () {
     function removeFiles(meta) {
         cmd = 'cd ' + allowedDirectory + ';rm';
 
-        for(i = 0; i < meta.fileCount; i++) {
-            cmd = cmd.concat(' "' + meta.fileName + '_' + i + '"');
-        }
+        cmd = cmd.concat(' "' + meta.fileName.split('_')[0] + '"');
 
         return cmd;
     }
