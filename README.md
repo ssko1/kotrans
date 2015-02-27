@@ -41,7 +41,7 @@ var server = kotrans.createServer([options], callback);
   * `server` Object.
     * If left undefined, kotrans will automatically create a server listener.
     * You may use an existing http.Server
-  * `directory` String
+  * `directory` String. Default: `__dirname`
     * Files will only be transferred to this 'allowed directory'
 
 Thats it! Your server should be listening on the specified port.
@@ -65,7 +65,7 @@ NOTE: Your Binary Server must listen on a different port than your Web Server!
 kotrans.client.sendFile(file, callback);
 ```
 
-Send a single `File` object to the specified directory. 
+Send a single `File` object to the Server's specified directory. 
 *  `File` is a jQuery event object given by `event.originalEvent.dataTransfer.files`
 
 Callback function is executed after file is finished transferring

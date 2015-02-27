@@ -100,7 +100,7 @@ kotrans.server = (function () {
 			stream.on('data', function (data) {
                 if(meta.cmd === Client2ServerFlag.send || meta.cmd === Client2ServerFlag.sendMul) {
                     uploadedBytes += data.length;
-                    percentComplete = (uploadedBytes / meta.fileSize) * 100;
+                    percentComplete = ((uploadedBytes / meta.fileSize) * 100).toPrecision(4);
                     //console.log(percentComplete);
                     client.send({}, {   percent: percentComplete,
                                         fileName: meta.fileName,
