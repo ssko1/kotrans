@@ -1,6 +1,6 @@
 {
   "name": "kotrans",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Web-based file transfer system",
   "main": " ",
   "dependencies": {
