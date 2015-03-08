@@ -33,7 +33,7 @@ How to use
 ## Creating your server
 ```javascript
 var kotrans = require('kotrans');
-var server = kotrans.createServer([options], callback);
+var server = kotrans.createServer([options], function(err) { });
 ```
 
 * `options`
