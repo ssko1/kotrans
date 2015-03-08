@@ -54,7 +54,11 @@ kotrans.server = (function () {
         if(arguments[0] instanceof Object && options) {
             allowedDirectory = options.directory || __dirname;
 
-            socketServer = new BinaryServer({ server: server });
+            if(!options.server) {
+                return;
+            }
+            
+            socketServer = new BinaryServer({ server: options.server });
 
             socketServer.on('connection', onSocketConnection);
 
