@@ -71,8 +71,14 @@ kotrans.client = (function () {
      * @return Client object
      */
 	function createClient(options) {
-		clientHost = options.host || 'localhost';
-		clientPort = options.port || 9000;
+		if(options) {
+			clientHost = options.host || 'localhost';
+			clientPort = options.port || 9000;
+		} else {
+			clientHost = 'localhost';
+			clientPort = 9000;
+		}
+		
 		client = new BinaryClient('ws://' + clientHost + ':' + clientPort + '/');
 
 		if(client == false) {

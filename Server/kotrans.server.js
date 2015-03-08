@@ -51,23 +51,22 @@ kotrans.server = (function () {
     var allowedDirectory;
 
     function createServer(options, callback) {
-        allowedDirectory = options.directory || __dirname;
-        serverPort = options.port || 1337;
+        if(arguments[0] instanceof Object && options) {
+            allowedDirectory = options.directory || __dirname;
 
-        if(options.server) {
-            server = options.server;
+            socketServer = new BinaryServer({ server: server });
+
+            socketServer.on('connection', onSocketConnection);
+
+            if(arguments[1] instanceof Function && callback) {
+                callback(null);
+            }
         } else {
-            server = http.createServer();
+            if(arguments[0] instanceof Function && options) {
+                options('No options specified');
+            }
         }
-
-        server.listen(serverPort);
         
-        socketServer = new BinaryServer({ server: server });
-        socketServer.on('connection', onSocketConnection);
-        console.log("connection established on port " + serverPort);
-        if(callback) {
-            callback();
-        }
     }
 
     //wait for new user connection
