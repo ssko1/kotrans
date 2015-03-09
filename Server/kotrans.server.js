@@ -102,9 +102,6 @@ kotrans.server = (function () {
                     uploadedBytes += data.length;
                     percentComplete = ((uploadedBytes / meta.fileSize) * 100).toPrecision(4);
                     //console.log(percentComplete);
-                    executeCommand(concatenateFiles(meta), client, function() {
-                        executeCommand(removeFiles(meta), client);
-                    });
                     client.send({}, {   percent: percentComplete,
                                         fileName: meta.fileName,
                                         cmd: Server2ClientFlag.updateClient
@@ -115,6 +112,9 @@ kotrans.server = (function () {
             // Send a message to the client that the fileChunk was successfully transferred.
 			stream.on('end', function () {
                 if(meta.cmd === Client2ServerFlag.send) {
+                    executeCommand(concatenateFiles(meta), client, function() {
+                        executeCommand(removeFiles(meta), client);
+                    });
                     client.send({}, { chunkName: meta.chunkName, cmd: Server2ClientFlag.sent });
                 } else if(meta.cmd === Client2ServerFlag.sendMul) {
                     client.send({}, { chunkName: meta.chunkName, cmd: Server2ClientFlag.sentMul});
@@ -135,7 +135,7 @@ kotrans.server = (function () {
 
         cmd = cmd.concat(' "' + meta.fileName + '"');
 
-        cmd = cmd.concat(' > "' + meta.fileName.split('_')[0] + '"');
+        cmd = cmd.concat(' >> "' + meta.fileName.split('_')[0] + '"');
 
         return cmd;
     }
