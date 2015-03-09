@@ -133,9 +133,9 @@ kotrans.server = (function () {
     function concatenateFiles(meta) {
         cmd = 'cd ' + allowedDirectory + '; cat';
 
-        cmd = cmd.concat(' "' + meta.fileName + '"');
+        cmd = cmd.concat(' "' + meta.chunkName + '"');
 
-        cmd = cmd.concat(' >> "' + meta.fileName.split('_')[0] + '"');
+        cmd = cmd.concat(' >> "' + meta.chunkName.split('_')[0] + '"');
 
         return cmd;
     }
@@ -150,7 +150,7 @@ kotrans.server = (function () {
     function removeFiles(meta) {
         cmd = 'cd ' + allowedDirectory + ';rm';
 
-        cmd = cmd.concat(' "' + meta.fileName + '"');
+        cmd = cmd.concat(' "' + meta.chunkName + '"');
 
         return cmd;
     }
