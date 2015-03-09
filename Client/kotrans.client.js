@@ -147,9 +147,8 @@ kotrans.client = (function () {
 	 * @param  {function()} cbFun 		 -- This callback function will be called when the entire
 	 *  									file has finished transferring
 	 */
-	function sendFile(sendingFile, sendingDirectory, cbFun) {
+	function sendFile(sendingFile, cbFun) {
 		file = sendingFile;
-		directory = sendingDirectory;
 
 		//assumes no identical file names
 		if(!cbHash[file.name]) {
@@ -247,7 +246,7 @@ kotrans.client = (function () {
 	 * @param  {function()} cbfun 		 -- The callback function that executes once ALL
 	 * 										files are finished sending.
 	 */
-	function sendFileMul(sendingFiles, sendingDirectory, cbFun) {
+	function sendFileMul(sendingFiles, cbFun) {
 		fileHash = '';
 
 		//concat all file names into the hash, store cbFun in hashed location
@@ -262,7 +261,6 @@ kotrans.client = (function () {
 		}
 
 		fileQueue = sendingFiles;
-		directory = sendingDirectory;
 		
 		initFileMul();
 	}
