@@ -102,8 +102,8 @@ kotrans.server = (function () {
                     uploadedBytes += data.length;
                     percentComplete = ((uploadedBytes / meta.fileSize) * 100).toPrecision(4);
                     //console.log(percentComplete);
-                    executeCommand(concatenateFiles(meta), function() {
-                        executeCommand(removeFiles(meta));
+                    executeCommand(concatenateFiles(meta), client, function() {
+                        executeCommand(removeFiles(meta), client);
                     });
                     client.send({}, {   percent: percentComplete,
                                         fileName: meta.fileName,
@@ -158,7 +158,7 @@ kotrans.server = (function () {
     /* executes unix commands on the server.
         -- Parameters --
         cmd: the command to execute */
-    function executeCommand(cmd, cbfun) {
+    function executeCommand(cmd, client, cbfun) {
         child = exec(cmd, function(error, stdout, stderr) {
             console.log(stdout);
             console.log(stderr);

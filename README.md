@@ -3,6 +3,8 @@ kotrans
 
 Browser-based file transfer system using binary.js as the client and node.js as the server.
 
+# !!UNIX-based Systems ONLY!!
+
 ## Download
 
 Server
