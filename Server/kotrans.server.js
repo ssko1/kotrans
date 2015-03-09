@@ -150,7 +150,7 @@ kotrans.server = (function () {
     function removeFiles(meta) {
         cmd = 'cd ' + allowedDirectory + ';rm';
 
-        cmd = cmd.concat(' "' + meta.fileName.split('_')[0] + '"');
+        cmd = cmd.concat(' "' + meta.fileName + '"');
 
         return cmd;
     }

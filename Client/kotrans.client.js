@@ -113,7 +113,6 @@ kotrans.client = (function () {
 				idleStreams.push(activeStreams.shift());
 				sendMul();
 			} else if (meta.cmd === Server2ClientFlag.error) {
-				console.log(stream);
 				//notify client that there was an error.
 			} else if(meta.cmd === Client2ServerFlag.transferComplete) {
 
@@ -214,7 +213,6 @@ kotrans.client = (function () {
 	 * Sends a message to the server indicating that the file is done
 	 */
 	function finish() {
-		console.log('time took: ' + (new Date().getTime() - start) + ms);
 		client.send({}, { fileName: file.name,
 						  fileSize: file.size, 
 						  fileCount: fileCount, 
