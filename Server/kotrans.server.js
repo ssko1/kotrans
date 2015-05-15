@@ -43,12 +43,12 @@ kotrans.server = (function () {
     function createServer(options, callback) {
         var options = options || {};
         var server = options.server;
-        var route = options.route;
+        var path = options.path;
         //code for multiple threads means faster concatenation
         processors = os.cpus().length;
         allowedDirectory = options.directory || __dirname;
 
-        socketServer = new BinaryServer({ server: server, path : route });
+        socketServer = new BinaryServer({ server: server, path : path });
 
         socketServer.on('connection', onSocketConnection);
 

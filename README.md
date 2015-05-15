@@ -3,7 +3,7 @@ kotrans
 
 Browser-based file transfer system using binary.js as the client and node.js as the server.
 
-###Based on how kotrans transfers very large files to the server, this module only works on applications that run under centOS/ubuntu and similar systems.
+###Due to how kotrans transfers very large files to the server, this module only works on applications that run under centOS/ubuntu and similar systems.
 
 ## Download
 
@@ -40,7 +40,7 @@ kotrans.createServer([options], function);
 
 * `options`
   * `server` Object. Must be an existing http/https Server
-  * `route` String. Default: '/'
+  * `path` String. Default: '/'
   * `directory` String. Default: `__dirname`
     * Files will only be transferred to this 'allowed directory'
 * `function` Callback
