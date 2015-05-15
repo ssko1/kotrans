@@ -3,7 +3,7 @@ kotrans
 
 Browser-based file transfer system using binary.js as the client and node.js as the server.
 
-# !!UNIX-based Systems ONLY!!
+###Based on how kotrans transfers very large files to the server, this module only works on applications that run under centOS/ubuntu and similar systems.
 
 ## Download
 
@@ -35,17 +35,17 @@ How to use
 ## Creating your server
 ```javascript
 var kotrans = require('kotrans');
-var server = kotrans.createServer([options], function(err) { });
+kotrans.createServer([options], function);
 ```
 
 * `options`
-  * `server` Object. Must be an existing http Server
+  * `server` Object. Must be an existing http/https Server
+  * `route` String. Default: '/'
   * `directory` String. Default: `__dirname`
     * Files will only be transferred to this 'allowed directory'
+* `function` Callback
 
-Thats it! Your server should be listening on your specified port.
-
-NOTE: Your Binary Server must be a different http Server than your Web Server!
+Thats it! Your server should be listening on your specified port and path.
 
 ## Creating your client
 
@@ -54,8 +54,10 @@ var client = kotrans.client.createClient([options]);
 ```
 
 * `options`
-  * `port` number. Default: `9000`
   * `host` String. Default: `localhost`
+  * `port` Number. Default: `9000`
+  * `no_streams` Number. Default: 2. The number of concurrent streams for data transfer.
+  * `path` String. Default: '/'. For routing purposes.
 
 
 ## Sending files from client to server
@@ -65,6 +67,4 @@ kotrans.client.sendFile(file, callback);
 ```
 
 Send a single `File` object to the Server's specified directory. 
-*  `File` is a jQuery event object given by `event.originalEvent.dataTransfer.files`
-
-Callback function is executed after file is finished transferring
+*  `File` is an event object given by `event.dataTransfer.files`

@@ -1,5 +1,5 @@
  /**
- * client.connection.js
+ * kotrans.client.js
  * 
  * Client connection using BinaryJS
  * A reference to this js file AND client.config.js should be in your HTML/PHP
@@ -19,149 +19,129 @@ kotrans.client = (function () {
 	var Client2ServerFlag = {
 		send: 'send',
 		sendMul: 'sendMul',
-		transferComplete: 'transferComplete'
+		transferComplete: 'transferComplete',
+		setup : 'setup'
 	}
 	
 	//sent signifies that the file chunk was sent.
 	var Server2ClientFlag = {
 		sent: 'sent',
-		sentMul: 'sentMul',
 		updateClient: 'updateClient',
 		commandComplete: 'commandComplete',
-		error: 'error'
+		error: 'error',
+		setup : 'setup'
 	}
-
-    var client, 
-    	clientPort,
-		clientHost;
-	/*alternate destination for file(s). if string is empty, ie. directory = '', server will automatically
-	place files where server.connection.js file is located.*/
-	var directory;
 
 	var file;
 
 	//stores
 	var fileChunks;
-
-	//number of files processed
-	var fileCount = 0;
-
-	//array for sending multiple files
-	var fileQueue;
-
-	/* multi-streaming capabilities NOT IMPLEMENTE*/
-	var idleStreams,
-		activeStreams;
-
-	var MAX_STREAMS = 1;
-	
-	//64MB Chunk size for files that are large
-	var chunk_size = 67108864;
-    
-    var fileHash;
-    //stores callback functions to a file FileController(s)
-    var cbHash = {};
+	var chunk_size = 4194304;
 
     var timeTook,
     	start;
-
-    /**
-     * creates a client object with a specified hostFileController on port 9000.
-     * 
-     * @return Client object
-     */
+   	var mainClient;
+    var clients;
+    var clientids;
+    var chunkNumber;
+    var totalChunks;
+    var sentChunks;
+    var allTransferred;
 	function createClient(options) {
-		if(options) {
-			clientHost = options.host || 'localhost';
-			clientPort = options.port || 9000;
-		} else {
-			clientHost = 'localhost';
-			clientPort = 9000;
-		}
+		var i;
+		var options = options || {};
+		var host = options.host || 'localhost';
+		var port = options.port || '9000';
+		var streams = options.no_streams || 2;
+		var path = options.path || '';
+		mainClient = location.protocol === 'https:' ? new BinaryClient('wss://' + host + ':' + port + path) : new BinaryClient('ws://' + host + ':' + port + path);
 		
-		client = new BinaryClient('ws://' + clientHost + ':' + clientPort + '/');
+		
+		clients = [];
+		clientids = 0;
+		allTransferred = false;
+		sentChunks = 0;
+		// init
+		mainClient.on('open', function() {
+			mainClient.pid = clientids++;
+			console.log('client ' + mainClient.pid + ' connected to server.');
+			
+		});
 
-		if(client == false) {
-			return;
+		mainClient.on('stream', function(stream, meta) {
+			if(meta.cmd === Server2ClientFlag.commandComplete) {
+				finish();
+			}
+		})
+
+		for(i = 0; i < streams; ++i) {
+			clients.push(initClient(host, port, path));
 		}
 
-		//wait for client open
+		return mainClient;
+	}
+
+	function initClient(host, port, path) {
+		var client = location.protocol === 'https:' ? new BinaryClient('wss://' + host + ':' + port + path) : new BinaryClient('ws://' + host + ':' + port + path);
+
 		client.on('open', function() {
-	 		idleStreams = [];
-	 		activeStreams = [];
+			client.pid = clientids++;
+			console.log('client ' + client.pid + ' connected to server.');
+		});
 
-	 		for (var i = 0; i < MAX_STREAMS; i++) {
-				var stream;
-				idleStreams.push(stream);
-			}
-	 	});
-
-	 	/**
-	 	 * Receives messages from the server
-	 	 * @param   stream -- the data sent
-	 	 * @param   meta -- information describing data sent
-	 	 */
-		client.on('stream', function (stream, meta) {
-			if (meta.cmd === Server2ClientFlag.sent) {
-				fileCount++;
-				console.log('done sending file chunk ' + meta.chunkName);
-				idleStreams.push(activeStreams.shift());
-				send();
-			} else if (meta.cmd === Server2ClientFlag.sentMul) {
-				fileCount++;
-				console.log('done sending file chunk ' + meta.chunkName);
-				idleStreams.push(activeStreams.shift());
-				sendMul();
-			} else if (meta.cmd === Server2ClientFlag.error) {
-				//notify client that there was an error.
-			} else if(meta.cmd === Client2ServerFlag.transferComplete) {
-
+		client.on('stream', function(stream, meta) {
+			if(meta.cmd === Server2ClientFlag.sent) {
+				//console.log('client ' + client.pid + ' successfully transfered.');
+				allTransferred = totalChunks === ++sentChunks;
+				if(fileChunks.length === 0) {
+					if(allTransferred) {
+						client.send({}, {
+							fileName : file.name,
+							fileSize : file.size,
+							cmd : Client2ServerFlag.transferComplete
+						});
+					}
+				} else {
+					var chunk = fileChunks.shift();
+					client.send(chunk, {
+						chunkName : file.name + '_' + chunkNumber++,
+						chunkSize : chunk.size,
+						fileSize : file.size,
+						fileName : file.name,
+						cmd : Client2ServerFlag.send
+					});
+				}
+			} else if(meta.cmd === Server2ClientFlag.commandComplete) {
+				finish();
+			} else if(meta.cmd === Server2ClientFlag.updateClient) {
+				//Will be sent the file name and the % compete
+				//lots of overhead if client that is sending is also giving updates.
 			}
 		});
-		
+
 		client.on('close', function() {
-			console.log('Client connection was stopped abruptly');
+			throw 'client ' + client.pid + ' closed unexpectedly.';
 		});
 
 		client.on('error', function(error) {
-			console.log(error);
+			throw error;
 		});
-		
+
 		return client;
 	}
 
-	////////////////////////
-	// SINGLE FILE LOGIC  //
-	////////////////////////
-
-	/**
-	 * Users call this function to send a single file. 
-	 * 
-	 * @param  {File} sendingFiles 		 -- Single File object to be sent
-	 * 
-	 * @param  {String} sendingDirectory -- A directory in which to store the file.
-	 * 										If the string is empty, ie. directory = '',
-	 * 										the default node __dirname global variable 
-	 * 										will be used instead.
-	 * 										
-	 * @param  {function()} cbFun 		 -- This callback function will be called when the entire
-	 *  									file has finished transferring
-	 */
+	var callback;
 	function sendFile(sendingFile, cbFun) {
+		totalChunks = 0;
+		sentChunks = 0;
+		allTransferred = false;
 		file = sendingFile;
-
-		//assumes no identical file names
-		if(!cbHash[file.name]) {
-			cbHash[file.name] = cbFun;
-		}
-
+		chunkNumber = 0;
+		mainClient.send({}, { cmd : Client2ServerFlag.setup });
+		callback = callback || cbFun;
 		initFile();
 	}	
 
-	/**
-	 * Initializes the file by splitting it into 400 MB chunks then pushing those chunks
-	 * into a queue.
-	 */
 	function initFile() {
 		start = new Date().getTime();
 		console.log('Initializing file: '  + file.name);
@@ -181,165 +161,33 @@ kotrans.client = (function () {
 			i += chunk_size;
 			currentSize += chunk_size;
 		}
-
+		totalChunks = fileChunks.length;
 		send();
 	}
-	
-	/**
-	 * Helper function that sends single files to the server.
-	 */
+
 	function send() {
-		console.log('sending file: ' + file.name);
-
-		if(fileChunks.length === 0) {
-			finish();
-		}
-		while (fileChunks.length !== 0 && idleStreams.length > 0) {
-			var fileChunk = fileChunks.shift();
-			activeStreams.push(idleStreams.shift());
-			
-			activeStreams[0] = client.send(fileChunk, { chunkName: file.name + '_' + fileCount,
-								 						chunkSize: fileChunk.size,
-														fileSize: file.size,
-														fileName: file.name,
-								 						directory: directory, 
-								 						cmd: Client2ServerFlag.send });
-		}
-	}
-
-	/**
-	 * When all file chunks are sent, this function is called. The callback function is exceuted.
-	 * Sends a message to the server indicating that the file is done
-	 */
-	function finish() {
-		client.send({}, { fileName: file.name,
-						  fileSize: file.size, 
-						  fileCount: fileCount, 
-					 	  cmd: Client2ServerFlag.transferComplete });
-
-		//reset file counter for next file
-		fileCount = 0;
-
-		console.log('finished transferring ' + file.name);
-
-		//execute callback function
-		if(cbHash[file.name]) {
-			cbHash[file.name]();
-		}
-	}
-
-	//////////////////////////
-	// MULTIPLE FILE LOGIC  //
-	//////////////////////////
-
-	/**
-	 * User calls this function to send multiple files to a directory. The callback function is executed
-	 * once all files are finished transferring.
-	 * 
-	 * @param  {File} sendingFiles		 -- The file object to be sent
-	 * 
-	 * @param  {String} sendingDirectory -- A directory in which to store the file. If the 
-	 * 										directory string parameter is empty, ie. 
-	 * 										directory = '', the default node __dirname location
-	 * 										will be used.
-	 * 										
-	 * @param  {function()} cbfun 		 -- The callback function that executes once ALL
-	 * 										files are finished sending.
-	 */
-	function sendFileMul(sendingFiles, cbFun) {
-		fileHash = '';
-
-		//concat all file names into the hash, store cbFun in hashed location
-		for(var i = 0; i < sendingFiles.length; i++) {
-			fileHash += sendingFiles[i].name;
-		}
-
-		console.log('Initiating sendFileMul with files: ' + fileHash);
-
-		if(!cbHash[fileHash]) {
-			cbHash[fileHash] = cbFun;
-		}
-
-		fileQueue = sendingFiles;
-		
-		initFileMul();
-	}
-
-	/**
-	 * Initiates files and splits them into 400 MB chunks. If there are no more files in 
-	 * fileQueue, then all files have transferred, calls finishMul();
-	 */
-	function initFileMul() {
-		if(fileQueue.length == 0) {
-			finishMul();
-		} else {
-			file = fileQueue.shift();
-			fileChunks = [];
-
-			console.log('Initializing file: '  + file.name);
-			var currentSize = chunk_size;
-			var i = 0;
-
-			while (i < file.size) {
-				//for the last chunk < chunk_size
-				if (i + chunk_size > file.size) {
-					fileChunks.push(file.slice(i));
-					break;
-				}
-				fileChunks.push(file.slice(i, currentSize));
-			
-				i += chunk_size;
-				currentSize += chunk_size;
+		clients.forEach(function(client) {
+			if(fileChunks.length !== 0) {
+				var chunk = fileChunks.shift();
+				client.send(chunk, {
+					chunkName : file.name + '_' + chunkNumber++,
+					chunkSize : chunk.size,
+					fileSize : file.size,
+					fileName : file.name,
+					cmd : Client2ServerFlag.send
+				});
 			}
-
-			sendMul();
-		}
+		});
 	}
 
-	/**
-	 * Helper function that does the sending. If all file chunks from one file are sent,
-	 * initFileMul() is called again to get the next file.
-	 */
-	function sendMul() {
-		console.log('Sending the file chunks...');
-		if(fileChunks.length === 0) {
-			client.send({}, { fileName: file.name,
-						      fileSize: file.size, 
-						      fileCount: fileCount,
-						      directory: directory, 
-					 	      cmd: Client2ServerFlag.transferComplete });
-
-			fileCount = 0;
-
-			initFileMul();
-		}
-
-		while (fileChunks.length !== 0 && idleStreams.length > 0) {
-			var fileChunk = fileChunks.shift();
-			activeStreams.push(idleStreams.shift());
-			
-			activeStreams[0] = client.send(fileChunk, { chunkName: file.name + '_' + fileCount,
-								 						chunkSize: fileChunk.size,
-								 						fileSize: file.size,
-								 						fileName: file.name,
-								 						directory: directory, 
-								 						cmd: Client2ServerFlag.sendMul });
-		}
-	}
-
-	/**
-	 * Executes the callback function associated with the fileHash
-	 */
-	function finishMul() {
-		console.log('Done transferring ALL files.');
-		if(cbHash[fileHash]) {
-			cbHash[fileHash]();
+	function finish() {
+		if(callback) {
+			callback();
 		}
 	}
 
 	return {
 		createClient: createClient,
-		sendFile: sendFile,
-		sendFileMul: sendFileMul
+		sendFile: sendFile
 	}
 })();
