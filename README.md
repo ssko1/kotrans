@@ -41,7 +41,7 @@ kotrans.createServer([options], function);
 * `options`
   * `server` Object. Must be an existing http/https Server
   * `path` String. Default: '/'
-  * `directory` String. Default: `__dirname`
+  * `directory` String. Default: `kotrans/uploads`
     * Files will only be transferred to this 'allowed directory'
 * `function` Callback
 
