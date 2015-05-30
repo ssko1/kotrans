@@ -4,7 +4,8 @@
   "description": "Web-based file transfer system",
   "main": " ",
   "dependencies": {
-    "binaryjs": "~0.2.1"
+    "binaryjs": "~0.2.1",
+    "async": "~1.0.0"
   },
   "devDependencies": {},
   "scripts": {
