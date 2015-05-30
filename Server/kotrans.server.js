@@ -1,4 +1,15 @@
-﻿'use strict';
+﻿/**
+ * server.connection.js
+ * 
+ * Server connection using node.js. To utilize this file, user must invoke the 
+ * require() nodejs method.
+ *
+ * require('path/to/server.connection.js');
+ * 
+ * @author  Sam Ko
+ */
+
+'use strict';
 
 var kotrans = kotrans || {};
 
@@ -33,6 +44,7 @@ kotrans.server = (function () {
     var worker;
 
     var uploadedBytes;
+    var fileSize;
 
     var file;
     var percentComplete;
@@ -43,15 +55,18 @@ kotrans.server = (function () {
     function createServer(options, callback) {
         var options = options || {};
         var server = options.server;
-        var path = options.path;
+        var route = options.route;
         //code for multiple threads means faster concatenation
         processors = os.cpus().length;
-        allowedDirectory = options.directory || __dirname;
+        allowedDirectory = options.directory || __dirname + '/../../../uploads';
 
-        socketServer = new BinaryServer({ server: server, path : path });
+        socketServer = new BinaryServer({ server: server, path : route });
 
         socketServer.on('connection', onSocketConnection);
 
+        socketServer.on('error', function(err) {
+            console.log(err);
+        })
         if(callback instanceof Function) {
             callback();
         }
@@ -68,7 +83,7 @@ kotrans.server = (function () {
 		client.on('stream', function (stream, meta) {
 			if (meta.cmd === Client2ServerFlag.send) {
                 file = fs.createWriteStream(path.join(allowedDirectory, meta.chunkName));
-
+                uploadedBytes += meta.chunkSize;
                 file.on('error', function(err) {
                     console.log(err);
                     process.exit();
@@ -76,26 +91,43 @@ kotrans.server = (function () {
 				stream.pipe(file);    
 			} else if(meta.cmd === Client2ServerFlag.transferComplete) {
                 //entire file has finished transferring, combining pieces together
-                child.send('finish');
+                child.send({
+                    cmd : 'finish'
+                });
             } else if(meta.cmd === Client2ServerFlag.setup) {
+                uploadedBytes = 0;
+                console.log(meta.fileSize);
+                fileSize = meta.fileSize;
                 if(child) {
                     child.kill();
                 }
                 child = child_process.fork('./worker', {
-                    cwd : allowedDirectory
+                    cwd : __dirname
                 });
 
                 child.on('message', function(message) {
                     if(message === 'working') {
                         setTimeout(function() {
-                            child.send('finish');
+                            child.send({
+                                cmd : 'finish'
+                            });
                         }, 50);
                     } else if(message === 'finished') {
                         client.send({}, { cmd : Server2ClientFlag.commandComplete });
+                        child.kill();
                     }
                 });
 
-                child.send('setup');;
+                child.send({
+                    cmd : 'setup'
+                });
+                child.send({
+                    cmd : 'directory',
+                    directory : allowedDirectory
+                });
+            } else if(meta.cmd === Server2ClientFlag.updateClient) {
+                console.log(uploadedBytes, fileSize, uploadedBytes / fileSize);
+                client.send({}, { cmd : Server2ClientFlag.updateClient, percent : (uploadedBytes / 1000000) / fileSize });
             }
 
             // Sends data back to the client with a percentage complete with file name
@@ -106,7 +138,10 @@ kotrans.server = (function () {
             // Send a message to the client that the fileChunk was successfully transferred.
 			stream.on('end', function () {
                 if(meta.cmd === Client2ServerFlag.send) {
-                    child.send(meta.chunkName);
+                    child.send({
+                        cmd : 'file',
+                        name : meta.chunkName
+                    });
                     client.send({}, { chunkName: meta.chunkName, cmd: Server2ClientFlag.sent });
                 }
 			});

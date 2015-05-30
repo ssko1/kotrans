@@ -64,7 +64,7 @@ kotrans.client = (function () {
 		// init
 		mainClient.on('open', function() {
 			mainClient.pid = clientids++;
-			console.log('client ' + mainClient.pid + ' connected to server.');
+			//console.log('client ' + mainClient.pid + ' connected to server.');
 			
 		});
 
@@ -72,6 +72,10 @@ kotrans.client = (function () {
 			if(meta.cmd === Server2ClientFlag.commandComplete) {
 				finish();
 			}
+		});
+
+		mainClient.on('error', function(err) {
+			throw err;
 		})
 
 		for(i = 0; i < streams; ++i) {
@@ -86,13 +90,13 @@ kotrans.client = (function () {
 
 		client.on('open', function() {
 			client.pid = clientids++;
-			console.log('client ' + client.pid + ' connected to server.');
+			//console.log('client ' + client.pid + ' connected to server.');
 		});
 
 		client.on('stream', function(stream, meta) {
 			if(meta.cmd === Server2ClientFlag.sent) {
 				//console.log('client ' + client.pid + ' successfully transfered.');
-				allTransferred = totalChunks === ++sentChunks;
+				allTransferred = (totalChunks === ++sentChunks); //&& fileOverflow.length === 0;
 				if(fileChunks.length === 0) {
 					if(allTransferred) {
 						client.send({}, {
@@ -100,7 +104,7 @@ kotrans.client = (function () {
 							fileSize : file.size,
 							cmd : Client2ServerFlag.transferComplete
 						});
-					}
+					} 
 				} else {
 					var chunk = fileChunks.shift();
 					client.send(chunk, {
@@ -136,21 +140,22 @@ kotrans.client = (function () {
 		sentChunks = 0;
 		allTransferred = false;
 		file = sendingFile;
+		console.log(file);
 		chunkNumber = 0;
-		mainClient.send({}, { cmd : Client2ServerFlag.setup });
+		mainClient.send({}, { cmd : Client2ServerFlag.setup, fileSize : file.size / 1000000 });
 		callback = callback || cbFun;
 		initFile();
 	}	
 
 	function initFile() {
-		start = new Date().getTime();
+		//console.log(file);
 		console.log('Initializing file: '  + file.name);
-
-		var currentSize = chunk_size;
 		fileChunks = [];
-		
+		var currentSize = chunk_size;
 		var i = 0;
+
 		while (i < file.size) {
+			//console.log(i);
 			//for the last chunk < chunk_size
 			if (i + chunk_size > file.size) {
 				fileChunks.push(file.slice(i));
@@ -164,8 +169,11 @@ kotrans.client = (function () {
 		totalChunks = fileChunks.length;
 		send();
 	}
-
+	var interval;
 	function send() {
+		interval = setInterval(function() {
+			mainClient.send({}, { cmd : Server2ClientFlag.updateClient });
+		}, 1000);
 		clients.forEach(function(client) {
 			if(fileChunks.length !== 0) {
 				var chunk = fileChunks.shift();
@@ -181,6 +189,7 @@ kotrans.client = (function () {
 	}
 
 	function finish() {
+		clearInterval(interval);
 		if(callback) {
 			callback();
 		}
