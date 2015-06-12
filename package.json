@@ -1,10 +1,11 @@
 {
   "name": "kotrans",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Web-based file transfer system",
   "main": " ",
   "dependencies": {
-    "binaryjs": "~0.2.1"
+    "binaryjs": "~0.2.1",
+    "async": "~1.0.0"
   },
   "devDependencies": {},
   "scripts": {
@@ -15,6 +16,8 @@
     "url": "https://github.com/CinnamonBagels/kotrans.git"
   },
   "keywords": [
+    "large",
+    "file",
     "transfer",
     "web",
     "binaryjs",

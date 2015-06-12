@@ -58,7 +58,7 @@ kotrans.server = (function () {
         var route = options.route;
         //code for multiple threads means faster concatenation
         processors = os.cpus().length;
-        allowedDirectory = options.directory || __dirname + '/../../../uploads';
+        allowedDirectory = options.directory || __dirname + '/../uploads/';
 
         socketServer = new BinaryServer({ server: server, path : route });
 
