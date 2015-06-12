@@ -35,7 +35,7 @@ How to use
 ## Creating your server
 ```javascript
 var kotrans = require('kotrans');
-kotrans.createServer([options], function);
+kotrans.createServer(options, function);
 ```
 
 * `options`
@@ -50,7 +50,7 @@ Thats it! Your server should be listening on your specified port and path.
 ## Creating your client
 
 ```javascript
-var client = kotrans.client.createClient([options]);
+var client = kotrans.client.createClient(options);
 ```
 
 * `options`
@@ -67,4 +67,4 @@ kotrans.client.sendFile(file, callback);
 ```
 
 Send a single `File` object to the Server's specified directory. 
-*  `File` is an event object given by `event.dataTransfer.files`
+*  `File` is an event object given by `event.dataTransfer.files`, usually coupled with a file drag-and-drop system.

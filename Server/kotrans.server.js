@@ -96,7 +96,6 @@ kotrans.server = (function () {
                 });
             } else if(meta.cmd === Client2ServerFlag.setup) {
                 uploadedBytes = 0;
-                console.log(meta.fileSize);
                 fileSize = meta.fileSize;
                 if(child) {
                     child.kill();
@@ -126,7 +125,6 @@ kotrans.server = (function () {
                     directory : allowedDirectory
                 });
             } else if(meta.cmd === Server2ClientFlag.updateClient) {
-                console.log(uploadedBytes, fileSize, uploadedBytes / fileSize);
                 client.send({}, { cmd : Server2ClientFlag.updateClient, percent : (uploadedBytes / 1000000) / fileSize });
             }
 
